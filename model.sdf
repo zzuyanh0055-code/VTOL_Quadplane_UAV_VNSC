@@ -9,12 +9,12 @@
         <pose>0 0 0 0 0 0</pose>
         <mass>2.8</mass>
         <inertia>
-          <ixx>139914439.72e-09</ixx>
-          <ixy>431062e-09</ixy>
-          <ixz>-7318191.31e-09</ixz>
-          <iyy>213848567.99e-09</iyy>
-          <iyz>-46837.69e-09</iyz>
-          <izz>350236510.48e-09</izz>
+          <ixx>0.1399</ixx>
+          <ixy>0.000431062</ixy>
+          <ixz>-0.00731819131</ixz>
+          <iyy>0.21384856799</iyy>
+          <iyz>-0.00004683769</iyz>
+          <izz>0.35023651048</izz>
         </inertia>
       </inertial>
       <collision name="fuselage_collision">
@@ -117,7 +117,7 @@
       <visual name="base_link_visual">
         <geometry>
           <mesh>
-            <uri>model://my_vtol_uav/meshes/My_Base_link.dae</uri>
+            <uri>model://VTOL_Quadplane/meshes/My_Base_link.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -256,7 +256,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://my_vtol_uav/meshes/My_Prop_CCW.dae</uri>
+            <uri>model://VTOL_Quadplane/meshes/My_Prop_CCW.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -264,7 +264,7 @@
           <specular>1.0 1.0 1.0</specular>
           <pbr>
             <metal>
-                <albedo_map>model://my_vtol_uav/materials/textures/x8.png</albedo_map>
+                <albedo_map>model://VTOL_Quadplane/materials/textures/x8.png</albedo_map>
                 <metalness>0.5</metalness>
             </metal>
           </pbr>
@@ -283,7 +283,6 @@
         <dynamics>
           <damping>0.002</damping>
         </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
 
@@ -315,7 +314,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://my_vtol_uav/meshes/My_Prop_CCW.dae</uri>
+            <uri>model://VTOL_Quadplane/meshes/My_Prop_CCW.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -323,7 +322,7 @@
           <specular>1.0 1.0 1.0</specular>
           <pbr>
             <metal>
-                <albedo_map>model://my_vtol_uav/materials/textures/x8.png</albedo_map>
+                <albedo_map>model://VTOL_Quadplane/materials/textures/x8.png</albedo_map>
                 <metalness>0.5</metalness>
             </metal>
           </pbr>
@@ -342,7 +341,6 @@
         <dynamics>
           <damping>0.002</damping>
         </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
 
@@ -374,7 +372,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://my_vtol_uav/meshes/My_Prop_CW.dae</uri>
+            <uri>model://VTOL_Quadplane/meshes/My_Prop_CW.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -382,7 +380,7 @@
           <specular>1.0 1.0 1.0</specular>
           <pbr>
             <metal>
-                <albedo_map>model://my_vtol_uav/materials/textures/x8.png</albedo_map>
+                <albedo_map>model://VTOL_Quadplane/materials/textures/x8.png</albedo_map>
                 <metalness>0.5</metalness>
             </metal>
           </pbr>
@@ -401,7 +399,6 @@
         <dynamics>
           <damping>0.002</damping>
         </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
 
@@ -433,7 +430,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://my_vtol_uav/meshes/My_Prop_CW.dae</uri>
+            <uri>model://VTOL_Quadplane/meshes/My_Prop_CW.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -441,7 +438,7 @@
           <specular>1.0 1.0 1.0</specular>
           <pbr>
             <metal>
-                <albedo_map>model://my_vtol_uav/materials/textures/x8.png</albedo_map>
+                <albedo_map>model://VTOL_Quadplane/materials/textures/x8.png</albedo_map>
                 <metalness>0.5</metalness>
             </metal>
           </pbr>
@@ -460,12 +457,11 @@
         <dynamics>
           <damping>0.002</damping>
         </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
 
     <link name="motor_f">
-      <pose>-0.19241 0 -0.02054 0 0 0</pose>
+      <pose>-0.19241 0 -0.02054 0 -1.570796327 0</pose>
       <inertial>
         <mass>0.020</mass>
         <inertia>
@@ -491,7 +487,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://my_vtol_uav/meshes/My_Prop_F.dae</uri>
+            <uri>model://VTOL_Quadplane/meshes/F_prop.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -499,8 +495,8 @@
           <specular>1.0 1.0 1.0</specular>
           <pbr>
             <metal>
-                <albedo_map>model://my_vtol_uav/materials/textures/x8.png</albedo_map>
-                <metalness>0.5</metalness>
+              <albedo_map>model://VTOL_Quadplane/materials/textures/x8.png</albedo_map>
+              <metalness>0.5</metalness>
             </metal>
           </pbr>
         </material>
@@ -518,13 +514,24 @@
         <dynamics>
           <damping>0.002</damping>
         </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+
+  <sensor name="motor_f_force_torque" type="force_torque">
+    <always_on>1</always_on>
+    <update_rate>100</update_rate>
+    <visualize>true</visualize>
+
+    <force_torque>
+      <frame>child</frame>
+      <measure_direction>child_to_parent</measure_direction>
+    </force_torque>
+  </sensor>
     </joint>
 
     <link name="left_aileron_link">
       <pose relative_to="left_aileron_joint">0 0 0 0 0 0</pose>
       <inertial>
+        <pose>-0.00818 0.06684 0 0 0 -0.15</pose>
         <mass>0.032</mass>
         <inertia>
           <ixx>181071.80e-09</ixx>
@@ -546,7 +553,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://my_vtol_uav/meshes/My_Left_aileron.dae</uri>
+            <uri>model://VTOL_Quadplane/meshes/My_Left_aileron.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -572,6 +579,7 @@
     <link name="right_aileron_link">
       <pose relative_to="right_aileron_joint">0 0 0 0 0 0</pose>
       <inertial>
+        <pose>-0.01221 -0.00046 0 0 0 0.17</pose>
         <mass>0.032</mass>
         <inertia>
           <ixx>181071.80e-09</ixx>
@@ -592,7 +600,7 @@
       <visual name="visual">
         <geometry>
           <mesh>
-            <uri>model://my_vtol_uav/meshes/My_Right_aileron.dae</uri>
+            <uri>model://VTOL_Quadplane/meshes/My_Right_aileron.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -618,6 +626,7 @@
     <link name="elevator_link">
       <pose relative_to="elevator_joint">0 0 0 0 0 0</pose>
       <inertial>
+        <pose>-0.00977 -0.079 -0.00279 0 0 0</pose>
         <mass>0.06398</mass>
         <inertia>
           <ixx>967642.28e-09</ixx>
@@ -646,7 +655,7 @@
       <visual name="visual">
         <geometry>
           <mesh>
-            <uri>model://my_vtol_uav/meshes/My_Elevator.dae</uri>
+            <uri>model://VTOL_Quadplane/meshes/My_Elevator.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -672,6 +681,7 @@
 <link name="left_rudder_link">
       <pose relative_to="left_rudder_joint">0 0 0 0 0 0</pose>
       <inertial>
+        <pose>-0.01168 -0.0004 -0.03548 0 0 0</pose>
         <mass>0.02311</mass>
         <inertia>
           <ixx>37856.50e-09</ixx>
@@ -686,7 +696,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://my_vtol_uav/meshes/My_Left_rudder.dae</uri>
+            <uri>model://VTOL_Quadplane/meshes/My_Left_rudder.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -708,6 +718,7 @@
     <link name="right_rudder_link">
       <pose relative_to="right_rudder_joint">0 0 0 0 0 0</pose>
       <inertial>
+        <pose>-0.01168 0.0004 -0.03548 0 0 0</pose>
         <mass>0.02311</mass>
         <inertia>
           <ixx>37856.50e-09</ixx>
@@ -722,7 +733,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://my_vtol_uav/meshes/My_Right_rudder.dae</uri>
+            <uri>model://VTOL_Quadplane/meshes/My_Right_rudder.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -777,7 +788,6 @@
         <dynamics>
           <damping>1.0</damping>
         </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
 
@@ -962,7 +972,7 @@
       <cma_stall>0.0</cma_stall>
       <area>0.02</area>
       <air_density>1.2041</air_density>
-      <cp>-0.074205 0 0</cp>
+     <cp>-0.074205 0 0</cp>
       <forward>0 -1 0</forward>
       <upward>0 0 -1</upward>
       <link_name>motor_f</link_name>
@@ -1281,11 +1291,11 @@
         <servo_min>1000</servo_min>
         <servo_max>2000</servo_max>
         <type>VELOCITY</type>
-        <p_gain>0.20</p_gain>
+        <p_gain>0.40</p_gain>
         <i_gain>0</i_gain>
         <d_gain>0</d_gain>
         <i_max>0</i_max>
-        <i_min>0</i_min>
+        <i_min>0.2</i_min>
         <cmd_max>2.5</cmd_max>
         <cmd_min>-2.5</cmd_min>
       </control>
