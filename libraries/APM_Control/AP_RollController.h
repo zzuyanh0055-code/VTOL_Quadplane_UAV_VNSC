@@ -24,6 +24,10 @@ public:
 
 private:
     float run_axis_rate_control(float desired_rate_degs, float scaler, bool disable_integrator, bool ground_mode) override;
+    float run_indi_rate_control(float desired_rate_degs,
+                                float scaler,
+                                bool disable_integrator,
+                                bool ground_mode);
 
     // Return true if the airspeed should be considered as under speed
     bool is_underspeed() const override;
@@ -43,5 +47,6 @@ private:
     // Return negative rate limit in deg per second (as a positive number) zero if disabled
     float get_negative_rate_limit_degs() const override;
 
+    AP_Int8 indi_enable;
     bool in_recovery;
 };

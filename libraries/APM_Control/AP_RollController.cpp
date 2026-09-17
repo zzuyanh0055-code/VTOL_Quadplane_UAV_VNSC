@@ -157,6 +157,13 @@ const AP_Param::GroupInfo AP_RollController::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("_ANGLE_P", 11, AP_RollController, angle_p, 0.0),
 
+    // @Param: _INDI_EN
+    // @DisplayName: Roll INDI controller enable
+    // @Description: Enables the experimental fixed-wing roll INDI controller. Zero uses the original PID controller.
+    // @Values: 0:Disabled,1:Enabled
+    // @User: Advanced
+    AP_GROUPINFO("_INDI_EN", 12, AP_RollController, indi_enable, 0),
+
     AP_GROUPEND
 };
 
@@ -217,6 +224,24 @@ bool AP_RollController::should_apply_rate_limits() const
 }
 
 /*
+  Temporary INDI entry point.
+
+  For this first wiring test it deliberately calls the original PID
+  controller. The actual INDI equations will be added only after
+  this version compiles and the new parameter is visible in SITL.
+*/
+float AP_RollController::run_indi_rate_control(float desired_rate_degs,
+                                               float scaler,
+                                               bool disable_integrator,
+                                               bool ground_mode)
+{
+    return run_rate_control(desired_rate_degs,
+                            scaler,
+                            disable_integrator,
+                            ground_mode);
+}
+
+/*
  Function returns an equivalent aileron deflection in centi-degrees in the range from -4500 to 4500
  A positive demand is up
 */
@@ -241,9 +266,20 @@ float AP_RollController::run_axis_rate_control(float desired_rate_degs, float sc
     }
 
     // in_recovery flag is only valid for single loop, clear it
+        // in_recovery flag is only valid for single loop, clear it
     in_recovery = false;
 
-    return run_rate_control(desired_rate_degs, scaler, disable_integrator, ground_mode);
+    if (indi_enable.get() != 0) {
+        return run_indi_rate_control(desired_rate_degs,
+                                     scaler,
+                                     disable_integrator,
+                                     ground_mode);
+    }
+
+    return run_rate_control(desired_rate_degs,
+                            scaler,
+                            disable_integrator,
+                            ground_mode);
 }
 
 /*
