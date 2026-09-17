@@ -260,10 +260,55 @@ float AP_RollController::run_indi_rate_control(float desired_rate_degs,
                                                bool disable_integrator,
                                                bool ground_mode)
 {
-    return run_rate_control(desired_rate_degs,
-                            scaler,
-                            disable_integrator,
-                            ground_mode);
+    // Run the original PID controller.
+    // Its output remains the actual aileron command during shadow mode.
+    const float pid_output_cd = run_rate_control(desired_rate_degs,
+                                                 scaler,
+                                                 disable_integrator,
+                                                 ground_mode);
+
+    const float dt = AP::scheduler().get_loop_period_s();
+    const float measured_rate_degs = degrees(get_measured_rate_rads());
+    const float pid_output_deg = pid_output_cd * 0.01f;
+
+    // First-order low-pass filter coefficient
+    const float cutoff_hz = MAX(indi_filter_hz.get(), 0.1f);
+    const float filter_term = M_2PI * cutoff_hz * dt;
+    const float alpha = constrain_float(filter_term / (1.0f + filter_term),
+                                        0.0f,
+                                        1.0f);
+
+    // Initialise filters without creating an acceleration spike
+    if (!indi_initialized || dt <= 0.0f) {
+        indi_rate_filtered_degs = measured_rate_degs;
+        indi_rate_filtered_prev_degs = measured_rate_degs;
+        indi_accel_filtered_degss = 0.0f;
+        indi_actuator_filtered_deg = pid_output_deg;
+        indi_initialized = true;
+
+        return pid_output_cd;
+    }
+
+    // Filter measured roll rate
+    indi_rate_filtered_degs +=
+        alpha * (measured_rate_degs - indi_rate_filtered_degs);
+
+    // Differentiate the filtered rate to estimate roll acceleration
+    const float raw_accel_degss =
+        (indi_rate_filtered_degs - indi_rate_filtered_prev_degs) / dt;
+
+    indi_rate_filtered_prev_degs = indi_rate_filtered_degs;
+
+    // Filter angular acceleration
+    indi_accel_filtered_degss +=
+        alpha * (raw_accel_degss - indi_accel_filtered_degss);
+
+    // Filter the PID aileron command using the same cutoff frequency
+    indi_actuator_filtered_deg +=
+        alpha * (pid_output_deg - indi_actuator_filtered_deg);
+
+    // Shadow mode: do not send an INDI command to the aircraft yet
+    return pid_output_cd;
 }
 
 /*
@@ -300,7 +345,7 @@ float AP_RollController::run_axis_rate_control(float desired_rate_degs, float sc
                                      disable_integrator,
                                      ground_mode);
     }
-
+    indi_initialized = false;
     return run_rate_control(desired_rate_degs,
                             scaler,
                             disable_integrator,

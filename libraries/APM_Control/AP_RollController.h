@@ -52,5 +52,12 @@ private:
     AP_Float indi_g1;
     AP_Float indi_filter_hz;
 
+    // INDI filtered states
+    bool indi_initialized = false;
+    float indi_rate_filtered_degs = 0.0f;
+    float indi_rate_filtered_prev_degs = 0.0f;
+    float indi_accel_filtered_degss = 0.0f;
+    float indi_actuator_filtered_deg = 0.0f;
+
     bool in_recovery;
 };
