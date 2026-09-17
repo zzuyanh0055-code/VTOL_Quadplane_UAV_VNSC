@@ -157,12 +157,37 @@ const AP_Param::GroupInfo AP_RollController::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("_ANGLE_P", 11, AP_RollController, angle_p, 0.0),
 
-    // @Param: _INDI_EN
+        // @Param: _INDI_EN
     // @DisplayName: Roll INDI controller enable
     // @Description: Enables the experimental fixed-wing roll INDI controller. Zero uses the original PID controller.
     // @Values: 0:Disabled,1:Enabled
     // @User: Advanced
     AP_GROUPINFO("_INDI_EN", 12, AP_RollController, indi_enable, 0),
+
+    // @Param: _INDI_KRATE
+    // @DisplayName: Roll INDI rate error gain
+    // @Description: Converts roll-rate error into the desired roll angular acceleration for the INDI controller.
+    // @Range: 0.1 20.0
+    // @Increment: 0.1
+    // @User: Advanced
+    AP_GROUPINFO("_INDI_KRATE", 13, AP_RollController, indi_krate, 4.0f),
+
+    // @Param: _INDI_G1
+    // @DisplayName: Roll INDI control effectiveness
+    // @Description: Estimated roll angular acceleration produced per degree of aileron deflection. This value must be identified for the aircraft.
+    // @Range: 1.0 1000.0
+    // @Increment: 1.0
+    // @User: Advanced
+    AP_GROUPINFO("_INDI_G1", 14, AP_RollController, indi_g1, 100.0f),
+
+    // @Param: _INDI_FILT
+    // @DisplayName: Roll INDI filter frequency
+    // @Description: Low-pass filter cutoff frequency used for roll rate, roll acceleration and actuator command signals.
+    // @Range: 1.0 30.0
+    // @Units: Hz
+    // @Increment: 0.5
+    // @User: Advanced
+    AP_GROUPINFO("_INDI_FILT", 15, AP_RollController, indi_filter_hz, 8.0f),
 
     AP_GROUPEND
 };

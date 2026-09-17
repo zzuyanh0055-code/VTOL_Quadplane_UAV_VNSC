@@ -48,5 +48,9 @@ private:
     float get_negative_rate_limit_degs() const override;
 
     AP_Int8 indi_enable;
+    AP_Float indi_krate;
+    AP_Float indi_g1;
+    AP_Float indi_filter_hz;
+
     bool in_recovery;
 };
