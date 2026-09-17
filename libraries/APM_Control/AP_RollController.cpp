@@ -21,6 +21,7 @@
 #include "AP_RollController.h"
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Scheduler/AP_Scheduler.h>
+#include <AP_Logger/AP_Logger.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -307,7 +308,32 @@ float AP_RollController::run_indi_rate_control(float desired_rate_degs,
     indi_actuator_filtered_deg +=
         alpha * (pid_output_deg - indi_actuator_filtered_deg);
 
-    // Shadow mode: do not send an INDI command to the aircraft yet
+    // Desired angular acceleration calculated from roll-rate error.
+    // This is recorded only and does not affect the aircraft.
+    const float desired_accel_degss =
+        indi_krate.get() *
+        (desired_rate_degs - indi_rate_filtered_degs);
+
+    // Log INDI shadow signals at approximately 50 Hz
+    const uint32_t now_ms = AP_HAL::millis();
+    if (now_ms - indi_last_log_ms >= 20U) {
+        indi_last_log_ms = now_ms;
+
+        AP::logger().WriteStreaming(
+            "INDI",
+            "TimeUS,DesR,RawR,FltR,DesA,Acc,Act,PID",
+            "Qfffffff",
+            AP_HAL::micros64(),
+            desired_rate_degs,
+            measured_rate_degs,
+            indi_rate_filtered_degs,
+            desired_accel_degss,
+            indi_accel_filtered_degss,
+            indi_actuator_filtered_deg,
+            pid_output_deg);
+    }
+
+    // Shadow mode: PID output is still sent to the aileron
     return pid_output_cd;
 }
 

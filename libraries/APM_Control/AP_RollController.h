@@ -58,6 +58,7 @@ private:
     float indi_rate_filtered_prev_degs = 0.0f;
     float indi_accel_filtered_degss = 0.0f;
     float indi_actuator_filtered_deg = 0.0f;
+    uint32_t indi_last_log_ms = 0;
 
     bool in_recovery;
 };
