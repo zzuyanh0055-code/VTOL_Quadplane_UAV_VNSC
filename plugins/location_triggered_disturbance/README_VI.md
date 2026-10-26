@@ -1,117 +1,50 @@
-# Disturbance tự động theo vị trí cho Flight_Test.plan
+# Nhiễu roll tự động theo vị trí
 
-## 1. Vị trí kích hoạt
+[Hướng dẫn mô phỏng](../../simulation/README.md) · [English configuration reference](README.md)
 
-Mission sử dụng home / VTOL takeoff tại:
+Tài liệu này mô tả mã hiện tại trong [LocationTriggeredWrench.cc](src/LocationTriggeredWrench.cc) và cấu hình của [model chính](../../simulation/models/VTOL_Quadplane/model.sdf).
 
-- latitude: -35.3632621 deg
-- longitude: 149.1652374 deg
-- relative altitude: 50 m
+## Cấu hình hiện tại
 
-Tọa độ địa phương tính từ điểm này:
+| Thông số | Giá trị |
+|---|---|
+| Link chịu mô-men | `base_link` |
+| x trong hệ world Gazebo | 371.5–416.5 m |
+| y trong hệ world Gazebo | 925–965 m |
+| z trong hệ world Gazebo | 35–70 m |
+| Mô-men quanh trục +X thân | 1 N·m |
 
-| Điểm | North (m) | East (m) | Gazebo x (m) | Gazebo y (m) |
-|---|---:|---:|---:|---:|
-| WP2 | 910.482 | -69.429 | -69.429 | 910.482 |
-| WP3 | 979.433 | 858.025 | 858.025 | 979.433 |
-| Trung điểm WP2-WP3 | 944.958 | 394.298 | 394.298 | 944.958 |
+Model chính ghi đè mô-men mặc định 0.60 N·m của mã nguồn thành 1 N·m. Kiểm tra block plugin của đúng SDF được nạp trước mỗi ca chạy.
 
-Model đang dùng phép biến đổi `gazeboXYZToNED = 180 0 90`, nên Gazebo
-`x = East`, `y = North`, `z = Up`.
+## Cơ chế kích hoạt
 
-Vùng trigger đã được đặt quanh trung điểm:
+- Khi khởi tạo model, plugin chuyển sang trạng thái chờ và in `Armed`.
+- Lần đầu link đi vào vùng, plugin in `ON` và bắt đầu tác động mô-men.
+- Mô-men tiếp tục được áp dụng khi link còn trong vùng.
+- Khi link ra khỏi vùng, plugin in `OFF`, ghi thời gian tác động và khóa trigger.
+- Khởi động lại mô phỏng để kích hoạt được lần tiếp theo.
 
-```text
-x = 386 ... 402 m
-y = 925 ... 965 m
-z = 35  ... 70  m
-```
+Mã hiện tại **không đọc tham số `duration_s`**. Mô tả cũ “0.08 N·m trong 0.50 s” không còn tương ứng với cấu hình này. Mô-men được biến đổi từ trục thân sang hệ world ở từng bước, nên hướng tác động đi theo trục roll của máy bay.
 
-Vùng dài 16 m theo hướng bay và rộng 40 m theo phương ngang. UAV bay khoảng
-15 m/s nên chắc chắn đi qua vùng, kể cả khi có một ít cross-track error.
+## Biên dịch và chạy
 
-## 2. Disturbance
-
-```text
-Moment roll thân máy bay: +0.08 N.m
-Thời gian:                0.50 s
-Số lần:                   1 lần mỗi lần khởi động Gazebo
-```
-
-Moment được biến đổi từ trục +X thân máy bay sang hệ tọa độ world ở từng bước
-mô phỏng. Vì vậy moment vẫn là roll disturbance khi heading thay đổi.
-
-## 3. Biên dịch plugin
-
-Mở terminal tại thư mục này:
+Chạy từ thư mục gốc repo:
 
 ```bash
-cmake -S . -B build
-cmake --build build -j$(nproc)
+cmake -S plugins/location_triggered_disturbance -B plugins/location_triggered_disturbance/build
+cmake --build plugins/location_triggered_disturbance/build -j"$(nproc)"
 ```
 
-Trước khi chạy Gazebo trong cùng terminal:
+Đặt đường dẫn plugin/resource và khởi động Gazebo theo [simulation/README.md](../../simulation/README.md). Model chính đã có block plugin; không cần chép đè bằng file SDF ví dụ để bật plugin.
 
-```bash
-export GZ_SIM_SYSTEM_PLUGIN_PATH="$PWD/build:${GZ_SIM_SYSTEM_PLUGIN_PATH}"
-```
+## So sánh PID–INDI
 
-Không cần `sudo make install`.
+- `RLL_INDI_EN=0`: PID.
+- `RLL_INDI_EN=1`: PID điều khiển, INDI chỉ tính và ghi log.
+- `RLL_INDI_EN=2`: INDI điều khiển trục roll fixed-wing.
 
-## 4. Thay model.sdf
+Giữ cùng mission, model, tham số, vùng và mô-men giữa hai lượt. Khởi động lại Gazebo giữa các lượt. Nếu không thấy `Armed`, hoặc máy bay không đi qua vùng nên không có `ON`, không coi đó là ca thử nhiễu thành công.
 
-Sao lưu model hiện tại, sau đó dùng file
-`model_with_location_disturbance.sdf` làm `model.sdf` của
-`model://VTOL_Quadplane`.
+Lưu cả thời gian chịu nhiễu thực tế: hai bộ điều khiển có thể ra khỏi vùng ở thời điểm khác nhau. Khi đánh giá, ghi rõ cửa sổ thời gian và định nghĩa metric cho sai số roll, roll rate, cross-track, altitude và control output.
 
-Không thay đổi world hoặc mission. World hiện tại có thể giữ nguyên plugin
-`ApplyLinkWrench`; plugin mới không phụ thuộc vào thao tác terminal.
-
-## 5. Kiểm tra trước khi bay A/B
-
-Khi Gazebo khởi động, terminal phải có dòng:
-
-```text
-[LocationTriggeredWrench] Armed ...
-```
-
-Khi UAV đi vào vùng, terminal tự in:
-
-```text
-[LocationTriggeredWrench] ON ...
-[LocationTriggeredWrench] OFF ...
-```
-
-Nếu không có dòng `Armed`, dừng bài bay và kiểm tra
-`GZ_SIM_SYSTEM_PLUGIN_PATH`; không dùng log đó để so sánh.
-
-## 6. Hai lượt bay
-
-Giữ nguyên mission và toàn bộ controller configuration:
-
-1. PID: `RLL_INDI_EN = 1`.
-2. INDI: `RLL_INDI_EN = 2`.
-
-Mỗi lượt phải khởi động lại Gazebo để trigger trở về trạng thái `armed`.
-Không thay moment hoặc vùng kích hoạt giữa hai lượt.
-
-Chỉ số so sánh chính sau onset:
-
-- peak roll-angle error;
-- peak roll-rate error;
-- roll-rate RMSE / MAE trong 5 s;
-- settling time về `|roll error| < 2 deg`;
-- maximum cross-track error và recovery cross-track RMSE;
-- peak controller output.
-
-## 7. Đổi mức disturbance sau này
-
-Chỉ sửa trong plugin block ở cuối model SDF:
-
-```xml
-<roll_torque_nm>0.08</roll_torque_nm>
-<duration_s>0.50</duration_s>
-```
-
-Nên hoàn thành cặp PID/INDI ở 0.08 N.m trước khi tăng mức. Không đổi gain INDI
-hoặc PID trong quá trình test disturbance.
+[Flight_Test.plan](Flight_Test.plan) hiện chứa VTOL takeoff và hai waypoint tiếp theo. Bộ mission nghiên cứu đầy đủ cần bổ sung theo [mission archive](../../simulation/missions/README.md).

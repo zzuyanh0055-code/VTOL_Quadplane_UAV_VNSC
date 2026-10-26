@@ -2,6 +2,8 @@
 
 This directory contains the ArduPilot modifications used to implement and test the experimental fixed-wing roll-axis INDI controller.
 
+[Project overview](../../README.md) · [Simulation setup](../../simulation/README.md)
+
 ## Included Files
 
 - `roll_indi.patch`: complete controller modifications relative to the recorded ArduPilot base commit.
@@ -45,6 +47,7 @@ INDI_BASE_COMMIT=$(tr -d '\n' < \
 
 git checkout "$INDI_BASE_COMMIT"
 git switch -c indi-fixedwing-dev
+git submodule update --init --recursive
 ```
 
 Verify and apply the patch:

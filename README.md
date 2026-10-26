@@ -1,172 +1,62 @@
-# VTOL QuadPlane UAV Simulation
+# Autonomous VTOL QuadPlane UAV
+### Airframe Design · Aerodynamic Analysis · Flight Performance Simulation
 
-Gazebo Sim and ArduPilot SITL simulation package for a separate-lift Hybrid VTOL fixed-wing UAV with a 4+1 configuration:
+A collaborative UAV project covering mechanical design, fabrication, aerodynamic modeling, and autonomous flight simulation of a separate-lift **4+1 QuadPlane**.
 
-- Four vertical-lift motors
-- One rear pusher motor
-- Ailerons, elevator, and twin rudders
-- PID baseline controller
-- Experimental roll-axis INDI controller
-- Position-triggered roll disturbance plugin
+The aircraft combines four vertical-lift motors with a rear pusher, a fixed wing, ailerons, an elevator, and twin rudders. The research workflow connects SolidWorks design and mass properties, OpenVSP/VSPAERO analysis, and Gazebo–ArduPilot SITL simulation. The control study compares the baseline PID controller with an experimental fixed-wing roll-axis INDI controller.
 
-## Simulation Environment
+**Thesis:** *Aerodynamic Analysis and Flight Performance Simulation of an Autonomous VTOL QuadPlane UAV* — University of Science and Technology of Hanoi (USTH).
 
-The project was developed and tested with:
+> **Repository status:** Simulation assets, controller modifications, and the disturbance plugin are available. The CAD, aerodynamic, hardware, media, and results sections currently contain upload guides; their project files have not yet been added. Simulation results and physical flight-test evidence will be identified separately.
 
-- Ubuntu 24.04
-- Gazebo Sim 8
-- ArduPilot SITL / ArduPlane
-- QGroundControl
-- CMake and C++17
+## Explore the Project
 
-## Repository Structure
+| Area | Contents | Availability |
+|---|---|---|
+| [Mechanical design](cad/README.md) | SolidWorks assemblies and parts, STEP exports, drawings | Awaiting project files |
+| [Aerodynamics](aerodynamics/README.md) | OpenVSP geometry, VSPAERO cases, coefficient data | Awaiting project files |
+| [Hardware and fabrication](hardware/README.md) | Airframe construction, avionics, wiring, component list | Awaiting project files |
+| [Flight simulation](simulation/README.md) | Gazebo models, worlds, ArduPlane parameters, setup | Available; fresh-environment reproduction pending |
+| [Roll controller](controller/ardupilot/README.md) | INDI patch, base commit, modified source | Available |
+| [Disturbance plugin](plugins/location_triggered_disturbance/README.md) | Position-triggered body-roll torque | Available |
+| [Results](results/README.md) | PID–INDI comparisons, aerodynamic plots, physical test records | Awaiting datasets and figures |
+| [Photos and renders](media/README.md) | Physical prototype, assembly photos, CAD and simulation views | Awaiting project images |
+| [Research documentation](docs/README.md) | Modeling notes, manuscript archive, attribution, upload checklist | Documentation scaffold available |
 
-```text
-.
-├── plugins/
-│   └── location_triggered_disturbance/
-│       ├── CMakeLists.txt
-│       └── src/
-│           └── LocationTriggeredWrench.cc
-│
-├── simulation/
-│   ├── ardupilot_gazebo/
-│   │   ├── config/
-│   │   ├── models/
-│   │   └── worlds/
-│   ├── models/
-│   │   ├── VTOL_Quadplane/
-│   │   └── alti_transition_quad/
-│   ├── gui/
-│   └── terrain/
-│
-└── README.md
-```
+## Engineering Workflow
 
-## Main Files
+1. **Design and fabrication:** develop the airframe, check packaging and mass distribution, and manufacture and assemble the prototype.
+2. **Aerodynamic analysis:** prepare the OpenVSP geometry and VSPAERO cases, then export coefficients with the associated reference quantities and operating conditions.
+3. **Dynamic modeling:** document the six-degree-of-freedom formulation and map mass, inertia, aerodynamic, and propulsion parameters into the simulation.
+4. **Flight simulation:** connect the Gazebo aircraft to ArduPlane SITL and execute QGroundControl missions.
+5. **Controller evaluation:** compare PID and INDI under matched missions and disturbance conditions.
+6. **Experimental documentation:** record the physical configuration and test outcomes separately from simulation evidence.
 
-- Aircraft model:
+See the [modeling and traceability guide](docs/modeling.md) for the information needed to connect these stages reproducibly.
 
-  `simulation/models/VTOL_Quadplane/model.sdf`
+## Simulation Entry Points
 
-- Gazebo world:
+The project environment uses Ubuntu 24.04, Gazebo Sim 8, ArduPlane SITL, and QGroundControl. The custom disturbance plugin uses CMake and C++17.
 
-  `simulation/ardupilot_gazebo/worlds/alti_transition_runway.sdf`
+| Item | File |
+|---|---|
+| Project aircraft | [model.sdf](simulation/models/VTOL_Quadplane/model.sdf) |
+| Runway world | [alti_transition_runway.sdf](simulation/ardupilot_gazebo/worlds/alti_transition_runway.sdf) |
+| Parameter set used by the setup guide | [alti_transition_quad.param](simulation/ardupilot_gazebo/config/alti_transition_quad.param) |
+| Existing example mission | [Flight_Test.plan](plugins/location_triggered_disturbance/Flight_Test.plan) |
+| INDI integration | [Controller instructions](controller/ardupilot/README.md) |
+| Disturbance implementation | [LocationTriggeredWrench.cc](plugins/location_triggered_disturbance/src/LocationTriggeredWrench.cc) |
 
-- ArduPlane parameter file:
+Start with the **[simulation setup guide](simulation/README.md)**. The existing mission is a short disturbance example, not the complete archive of research missions.
 
-  `simulation/ardupilot_gazebo/config/alti_transition_quad.param`
+## Research Scope and Evidence
 
-- Disturbance plugin source:
+The repository supports inspection of the simulation implementation. Quantitative performance comparisons require the corresponding mission, parameter snapshot, disturbance configuration, logs, and analysis method; these have not yet been assembled into a results dataset here.
 
-  `plugins/location_triggered_disturbance/src/LocationTriggeredWrench.cc`
+The INDI implementation modifies the **fixed-wing roll axis only**. It is a research modification, not an official ArduPilot controller. Availability of simulation code does not establish physical flight validation of INDI.
 
-## Build the Location-Triggered Disturbance Plugin
+## Completing the Archive
 
-From the repository root:
+Follow the **[upload checklist / Hướng dẫn bổ sung dữ liệu](docs/upload-checklist.md)**. Prioritize a clear photograph of the completed aircraft, the final SolidWorks assembly and STEP export, the OpenVSP model, and a small set of traceable result figures.
 
-```bash
-cmake \
-  -S plugins/location_triggered_disturbance \
-  -B plugins/location_triggered_disturbance/build
-
-cmake --build \
-  plugins/location_triggered_disturbance/build \
-  -j"$(nproc)"
-```
-
-The generated library should be:
-
-```text
-plugins/location_triggered_disturbance/build/libLocationTriggeredWrench.so
-```
-
-## Configure Gazebo Paths
-
-Run from the repository root:
-
-```bash
-export GZ_SIM_SYSTEM_PLUGIN_PATH="$PWD/plugins/location_triggered_disturbance/build:${GZ_SIM_SYSTEM_PLUGIN_PATH}"
-
-export GZ_SIM_RESOURCE_PATH="$PWD/simulation/models:$PWD/simulation/ardupilot_gazebo/models:${GZ_SIM_RESOURCE_PATH}"
-```
-
-These commands must be executed in every new terminal session unless they are added to `.bashrc`.
-
-## Start Gazebo
-
-```bash
-gz sim -v4 -r \
-simulation/ardupilot_gazebo/worlds/alti_transition_runway.sdf
-```
-
-A successful disturbance-plugin load should include a message similar to:
-
-```text
-[LocationTriggeredWrench] Armed for link [base_link]
-```
-
-## Start ArduPlane SITL
-
-ArduPilot must be installed separately.
-
-Example command:
-
-```bash
-cd /path/to/ardupilot
-
-sim_vehicle.py \
-  -v ArduPlane \
-  -f quadplane \
-  --model JSON \
-  --add-param-file=/path/to/VTOL_Quadplane_UAV_VNSC/simulation/ardupilot_gazebo/config/alti_transition_quad.param \
-  --console
-```
-
-Replace `/path/to/...` with the actual paths on the local computer.
-
-## Roll Controller Selection
-
-The experimental parameter `RLL_INDI_EN` selects the roll controller:
-
-| Value | Operating mode |
-|---:|---|
-| `0` | Conventional PID |
-| `1` | PID active with INDI shadow logging |
-| `2` | INDI active on the roll axis |
-
-The custom ArduPilot INDI source or patch must be installed before this parameter becomes available.
-
-## Position-Triggered Disturbance
-
-The custom Gazebo system plugin applies a constant body-roll moment while the aircraft remains inside a defined three-dimensional zone.
-
-The current test configuration is stored in:
-
-```text
-simulation/models/VTOL_Quadplane/model.sdf
-```
-
-The disturbance is activated on zone entry and deactivated when the aircraft exits the zone. The trigger remains locked until the simulation is restarted.
-
-Example startup message:
-
-```text
-[LocationTriggeredWrench] Armed for link [base_link];
-body-roll torque=1 N.m while the aircraft remains inside the zone.
-```
-
-## Test Method
-
-The primary comparison cases are:
-
-1. PID trajectory tracking without disturbance.
-2. INDI trajectory tracking without disturbance.
-3. PID flight through the fixed disturbance zone.
-4. INDI flight through the same disturbance zone.
-
-The same mission, aircraft model, parameter set, waypoint radius, airspeed command, and disturbance configuration should be used for each PID–INDI comparison.
-
-## Runtime Files
-
-Flight logs, Gazebo runtime data, compiled libraries, and build directories are intentionally excluded from Git. These files should be generated locally.
+This is a team project. A contributor and role summary, manuscript metadata, and project-original licensing remain to be completed. Existing third-party notices are retained; see [attribution and licensing](docs/attribution.md).
